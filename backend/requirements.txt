@@ -2,3 +2,5 @@ flask
 flask-cors
 openai
 pydantic
+requests
+weaviate-client
