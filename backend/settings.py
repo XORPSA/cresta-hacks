@@ -12,7 +12,13 @@ class AuthConfig(BaseModel):
         default_factory=lambda: os.getenv("CONFIG_USE_SECURE_CHANNEL", "false").lower() == "true"
     )
 
+class WeaviateConfig(BaseModel):
+    url: str = Field(default_factory=lambda: os.getenv("WEAVIATE_URL"))
+    api_key: str = Field(default_factory=lambda: os.getenv("WEAVIATE_API_KEY"))
+    rest_endpoint: str = Field(default_factory=lambda: os.getenv("WEAVIATE_REST_ENDPOINT"))
+    grpc_endpoint: str = Field(default_factory=lambda: os.getenv("WEAVIATE_GRPC_ENDPOINT"))
+
 class Settings(BaseModel):
     openai_credentials: OpenAICredentials = Field(default_factory=OpenAICredentials)
     auth_config: AuthConfig = Field(default_factory=AuthConfig)
-
+    weaviate_config: WeaviateConfig = Field(default_factory=WeaviateConfig)
