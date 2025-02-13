@@ -1,5 +1,7 @@
-1. change the prompt for extracting product, issue, and steps for troubleshooting
-2. use structured output for the response
-3. get 200 recent chats
+1. change the prompt for extracting product, issue, and steps for troubleshooting - done
+2. use structured output for the response - done
+3. get 200 recent chats - done
 4. modify cluster function to use 2-level clustering approach: product -> issue to get "leaf troubleshooting guides" and "internal nodes products"
+  4a. product level - done
+  4b. issue level
 5. send all flows in a leaf to LLM to generate an overall troubleshooting guide
