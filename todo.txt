@@ -3,5 +3,10 @@
 3. get 200 recent chats - done
 4. modify cluster function to use 2-level clustering approach: product -> issue to get "leaf troubleshooting guides" and "internal nodes products"
   4a. product level - done
-  4b. issue level
-5. send all flows in a leaf to LLM to generate an overall troubleshooting guide
+  4b. issue level - done
+5. send all flows in a leaf to LLM to generate an overall troubleshooting guide - done
+
+optional:
+1. create some sort of UI for the troubleshooting guide
+2. put all sku names in system prompt for flow discovery. This will ensure the product names are correct.
+3. merge the group_workflows_by_product and group_workflows_by_issue functions into a single function using a new parameter called "group_by"
