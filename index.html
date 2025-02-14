@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Troubleshooting Guide</title>
     <style>
@@ -12,14 +13,21 @@
             --border-color: #e5e7eb;
         }
 
+        /* BODY is now full width; no max-width or auto margins here */
         body {
+            margin: 0;
+            padding: 0;
+            background: var(--background-color);
+            color: var(--text-color);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* .container holds the main content, centered and max-width 1200px */
+        .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
-            background: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.5;
         }
 
         h1 {
@@ -47,14 +55,14 @@
             font-size: clamp(0.9rem, 1.5vw, 1.1rem);
             background-color: white;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
-                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .search:focus {
             outline: none;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15), 
-                        0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15),
+                0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .search-icon {
@@ -135,7 +143,7 @@
             background: white;
             border-left: 4px solid var(--primary-color);
             border-radius: 0 6px 6px 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .steps li {
@@ -158,13 +166,13 @@
         }
 
         @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(-5px); 
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
             }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
@@ -191,6 +199,7 @@
             #guide {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 250px));
             }
+
             .product {
                 width: 250px;
                 height: 250px;
@@ -201,6 +210,7 @@
             #guide {
                 grid-template-columns: repeat(auto-fill, minmax(220px, 220px));
             }
+
             .product {
                 width: 220px;
                 height: 220px;
@@ -252,45 +262,49 @@
         }
 
         /* Modal styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-        }
-
         .modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.95);
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 800px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            z-index: 1001;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
+    display: inline-block;      /* Let the modal size to its content */
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    z-index: 1001;
+    position: fixed;
+    max-width: 90%;            /* Constrain width to 90% of the viewport */
+    max-height: 90vh;          /* Constrain height to 90% of the viewport */
+    overflow-y: auto;          /* Add scroll if content is taller than viewport */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    opacity: 0;                /* Start hidden */
+    transition: opacity 0.3s ease-in-out;
+}
 
-        .modal.active {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-        }
+/* Center modal in the viewport */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    display: flex;             /* Use flexbox for centering */
+    justify-content: center;
+    align-items: center;
+    opacity: 0;                /* Start hidden */
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal.active {
+    opacity: 1;
+}
+
+
 
         .modal-header {
             display: flex;
@@ -384,15 +398,23 @@
         }
     </style>
 </head>
+
 <body>
-    <h1>Troubleshooting Guide</h1>
-    <div class="search-container">
-        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-        <input type="text" class="search" placeholder="Search products, issues, or steps...">
+    <!-- .container wraps your main content -->
+    <div class="container">
+        <h1>Troubleshooting Guide</h1>
+        <div class="search-container">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" class="search" placeholder="Search products, issues, or steps...">
+        </div>
+        <div id="guide"></div>
     </div>
-    <div id="guide"></div>
+    
+    <!-- The modal markup is appended to body (full viewport) -->
 
     <script>
         // Update the parseMarkdown function to create a different structure
@@ -401,7 +423,7 @@
             const data = {};
             let currentProduct = '';
             let currentIssue = '';
-            
+
             lines.forEach(line => {
                 if (line.startsWith('# Product:')) {
                     const productMatch = line.match(/['"](.+?)['"]/) || [];
@@ -416,7 +438,7 @@
                     data[currentProduct].issues[currentIssue].push(step);
                 }
             });
-            
+
             return data;
         }
 
@@ -425,54 +447,58 @@
         let currentIssue = null;
 
         function showModal(product) {
-            currentProduct = product;
-            currentIssue = null;
-            
-            // Check if modal already exists
-            let modal = document.querySelector('.modal-overlay');
-            if (!modal) {
-                modal = document.createElement('div');
-                modal.className = 'modal-overlay';
-                document.body.appendChild(modal);
-            }
-            
-            modal.innerHTML = `
-                <div class="modal">
-                    <div class="modal-header">
-                        <div class="modal-title">${product}</div>
-                        <button class="modal-close">&times;</button>
-                    </div>
-                    <div class="issue-list">
-                        ${Object.keys(guideData[product].issues).map(issue => `
-                            <div class="issue-item">${issue}</div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-            
-            requestAnimationFrame(() => {
-                modal.style.display = 'block';
-                requestAnimationFrame(() => {
-                    modal.classList.add('active');
-                    modal.querySelector('.modal').classList.add('active');
-                });
-            });
-            
-            modal.querySelector('.modal-close').addEventListener('click', () => {
-                closeModal(modal);
-            });
-            
-            modal.querySelectorAll('.issue-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    showSteps(item.textContent, modal);
-                });
-            });
-        }
+    let modalOverlay = document.querySelector('.modal-overlay');
+    if (!modalOverlay) {
+        modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        document.body.appendChild(modalOverlay);
+    }
+
+    modalOverlay.innerHTML = `
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">${product}</div>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="issue-list">
+                ${Object.keys(guideData[product].issues).map(issue => `
+                    <div class="issue-item">${issue}</div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    // Add active class to show modal
+    requestAnimationFrame(() => {
+        modalOverlay.classList.add('active');
+        modalOverlay.querySelector('.modal').classList.add('active');
+    });
+
+    // Close modal functionality
+    modalOverlay.querySelector('.modal-close').addEventListener('click', () => closeModal(modalOverlay));
+
+    // Handle issue item clicks
+    modalOverlay.querySelectorAll('.issue-item').forEach(item => {
+        item.addEventListener('click', () => {
+            showSteps(item.textContent, modalOverlay);
+        });
+    });
+}
+
+function closeModal(modalOverlay) {
+    modalOverlay.classList.remove('active');
+    setTimeout(() => modalOverlay.remove(), 300); // Wait for fade-out animation
+}
+
 
         function showSteps(issue, modal) {
+            console.log('Steps view initial position:', {
+                scrollTop: modal.querySelector('.modal').scrollTop
+            });
+
             currentIssue = issue;
             const steps = guideData[currentProduct].issues[issue];
-            
+
             const modalContent = modal.querySelector('.modal');
             modalContent.innerHTML = `
                 <div class="modal-header">
@@ -486,12 +512,21 @@
                     <button class="nav-button back-to-issues">← Back</button>
                 </div>
             `;
-            
+
+            // Log final scroll position after content change
+            requestAnimationFrame(() => {
+                console.log('Steps view final position:', {
+                    scrollTop: modalContent.scrollTop,
+                    height: modalContent.scrollHeight
+                });
+            });
+
             modalContent.querySelector('.modal-close').addEventListener('click', () => {
                 closeModal(modal);
             });
-            
+
             modalContent.querySelector('.back-to-issues').addEventListener('click', () => {
+                console.log('Transitioning back to issues view');
                 // Just update the content instead of creating a new modal
                 const modalContent = modal.querySelector('.modal');
                 modalContent.innerHTML = `
@@ -505,12 +540,12 @@
                         `).join('')}
                     </div>
                 `;
-                
+
                 // Reattach event listeners
                 modalContent.querySelector('.modal-close').addEventListener('click', () => {
                     closeModal(modal);
                 });
-                
+
                 modalContent.querySelectorAll('.issue-item').forEach(item => {
                     item.addEventListener('click', () => {
                         showSteps(item.textContent, modal);
@@ -520,6 +555,11 @@
         }
 
         function closeModal(modal) {
+            console.log('Closing modal from position:', {
+                top: modal.querySelector('.modal').getBoundingClientRect().top,
+                left: modal.querySelector('.modal').getBoundingClientRect().left
+            });
+
             modal.classList.remove('active');
             modal.querySelector('.modal').classList.remove('active');
             setTimeout(() => {
@@ -527,19 +567,19 @@
             }, 300);
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             fetch('troubleshooting_guide.md')
                 .then(response => response.text())
                 .then(content => {
                     guideData = parseMarkdown(content);
                     const guide = document.getElementById('guide');
-                    
+
                     guide.innerHTML = Object.keys(guideData).map(product => `
                         <div class="product" data-product="${product}">
                             <div class="product-header">${product}</div>
                         </div>
                     `).join('');
-                    
+
                     document.querySelectorAll('.product').forEach(product => {
                         product.addEventListener('click', () => {
                             showModal(product.dataset.product);
@@ -548,7 +588,7 @@
                 });
 
             // Update the search functionality
-            document.querySelector('.search').addEventListener('input', function(e) {
+            document.querySelector('.search').addEventListener('input', function (e) {
                 const searchTerm = e.target.value.toLowerCase();
                 const guide = document.getElementById('guide');
                 const products = document.querySelectorAll('.product');
@@ -578,4 +618,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
