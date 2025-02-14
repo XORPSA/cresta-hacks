@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Troubleshooting Guide</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --background-color: #f3f4f6;
+            --text-color: #1f2937;
+            --hover-color: #dbeafe;
+            --border-color: #e5e7eb;
+        }
+
+        /* BODY is now full width; no max-width or auto margins here */
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--background-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* .container holds the main content, centered and max-width 1200px */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 2.5rem;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 2.5rem auto;
+        }
+
+        .search {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: none;
+            border-radius: 12px;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            background-color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .search:focus {
+            outline: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15),
+                0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--primary-color);
+            pointer-events: none;
+        }
+
+        .product {
+            aspect-ratio: 1;
+            width: 280px;
+            height: 280px;
+            margin-bottom: 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: none;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-header {
+            width: 100%;
+            height: 100%;
+            padding: 2rem;
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .issues {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .issues.active {
+            max-height: none;
+            padding: 1rem;
+        }
+
+        .issue {
+            margin: 0.5rem 0;
+            padding: 1rem;
+            background: var(--background-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .steps {
+            display: none;
+            padding: 1.25rem;
+            margin: 0.75rem 0;
+            background: white;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 6px 6px 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .steps li {
+            margin: 0.75rem 0;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .steps li:last-child {
+            border-bottom: none;
+        }
+
+        .active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .highlight {
+            background: #fef3c7;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            #guide {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 250px));
+            }
+
+            .product {
+                width: 250px;
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #guide {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 220px));
+            }
+
+            .product {
+                width: 220px;
+                height: 220px;
+            }
+        }
+
+        /* Update grid layout for products */
+        #guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 280px));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            justify-content: center;
+        }
+
+        .product {
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            min-height: 200px;
+        }
+
+        .product-header {
+            padding: 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            transition: all 0.3s ease;
+            text-align: center;
+            flex: 0 0 auto;
+        }
+
+        .issues {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .issues.active {
+            max-height: none;
+            padding: 1rem;
+        }
+
+        /* Modal styles */
+        .modal {
+    display: inline-block;      /* Let the modal size to its content */
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    z-index: 1001;
+    position: fixed;
+    max-width: 90%;            /* Constrain width to 90% of the viewport */
+    max-height: 90vh;          /* Constrain height to 90% of the viewport */
+    overflow-y: auto;          /* Add scroll if content is taller than viewport */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    opacity: 0;                /* Start hidden */
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Center modal in the viewport */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    display: flex;             /* Use flexbox for centering */
+    justify-content: center;
+    align-items: center;
+    opacity: 0;                /* Start hidden */
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal.active {
+    opacity: 1;
+}
+
+
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .modal-nav {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 2rem;
+        }
+
+        .nav-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background: var(--secondary-color);
+        }
+
+        .nav-button:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .issue-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .issue-item {
+            padding: 1rem;
+            background: var(--background-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .issue-item:hover {
+            transform: translateX(5px);
+            background: var(--hover-color);
+        }
+
+        .steps-list {
+            margin-top: 1rem;
+        }
+
+        .steps-list li {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--background-color);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* Add styles for no results message */
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- .container wraps your main content -->
+    <div class="container">
+        <h1>Troubleshooting Guide</h1>
+        <div class="search-container">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" class="search" placeholder="Search products, issues, or steps...">
+        </div>
+        <div id="guide"></div>
+    </div>
+    
+    <!-- The modal markup is appended to body (full viewport) -->
+
+    <script>
+        // Update the parseMarkdown function to create a different structure
+        function parseMarkdown(content) {
+            const lines = content.split('\n');
+            const data = {};
+            let currentProduct = '';
+            let currentIssue = '';
+
+            lines.forEach(line => {
+                if (line.startsWith('# Product:')) {
+                    const productMatch = line.match(/['"](.+?)['"]/) || [];
+                    currentProduct = productMatch[1] || line;
+                    data[currentProduct] = { issues: {} };
+                } else if (line.startsWith('## **Issue:')) {
+                    const issueMatch = line.match(/['"](.+?)['"]/) || [];
+                    currentIssue = issueMatch[1] || line;
+                    data[currentProduct].issues[currentIssue] = [];
+                } else if (line.startsWith('- ')) {
+                    const step = line.substring(2);
+                    data[currentProduct].issues[currentIssue].push(step);
+                }
+            });
+
+            return data;
+        }
+
+        let guideData = null;
+        let currentProduct = null;
+        let currentIssue = null;
+
+        function showModal(product) {
+    let modalOverlay = document.querySelector('.modal-overlay');
+    if (!modalOverlay) {
+        modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        document.body.appendChild(modalOverlay);
+    }
+
+    modalOverlay.innerHTML = `
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">${product}</div>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="issue-list">
+                ${Object.keys(guideData[product].issues).map(issue => `
+                    <div class="issue-item">${issue}</div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    // Add active class to show modal
+    requestAnimationFrame(() => {
+        modalOverlay.classList.add('active');
+        modalOverlay.querySelector('.modal').classList.add('active');
+    });
+
+    // Close modal functionality
+    modalOverlay.querySelector('.modal-close').addEventListener('click', () => closeModal(modalOverlay));
+
+    // Handle issue item clicks
+    modalOverlay.querySelectorAll('.issue-item').forEach(item => {
+        item.addEventListener('click', () => {
+            showSteps(item.textContent, modalOverlay);
+        });
+    });
+}
+
+function closeModal(modalOverlay) {
+    modalOverlay.classList.remove('active');
+    setTimeout(() => modalOverlay.remove(), 300); // Wait for fade-out animation
+}
+
+
+        function showSteps(issue, modal) {
+            console.log('Steps view initial position:', {
+                scrollTop: modal.querySelector('.modal').scrollTop
+            });
+
+            currentIssue = issue;
+            const steps = guideData[currentProduct].issues[issue];
+
+            const modalContent = modal.querySelector('.modal');
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <div class="modal-title">${issue}</div>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <ol class="steps-list">
+                    ${steps.map(step => `<li>${step}</li>`).join('')}
+                </ol>
+                <div class="modal-nav">
+                    <button class="nav-button back-to-issues">← Back</button>
+                </div>
+            `;
+
+            // Log final scroll position after content change
+            requestAnimationFrame(() => {
+                console.log('Steps view final position:', {
+                    scrollTop: modalContent.scrollTop,
+                    height: modalContent.scrollHeight
+                });
+            });
+
+            modalContent.querySelector('.modal-close').addEventListener('click', () => {
+                closeModal(modal);
+            });
+
+            modalContent.querySelector('.back-to-issues').addEventListener('click', () => {
+                console.log('Transitioning back to issues view');
+                // Just update the content instead of creating a new modal
+                const modalContent = modal.querySelector('.modal');
+                modalContent.innerHTML = `
+                    <div class="modal-header">
+                        <div class="modal-title">${currentProduct}</div>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="issue-list">
+                        ${Object.keys(guideData[currentProduct].issues).map(issue => `
+                            <div class="issue-item">${issue}</div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Reattach event listeners
+                modalContent.querySelector('.modal-close').addEventListener('click', () => {
+                    closeModal(modal);
+                });
+
+                modalContent.querySelectorAll('.issue-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        showSteps(item.textContent, modal);
+                    });
+                });
+            });
+        }
+
+        function closeModal(modal) {
+            console.log('Closing modal from position:', {
+                top: modal.querySelector('.modal').getBoundingClientRect().top,
+                left: modal.querySelector('.modal').getBoundingClientRect().left
+            });
+
+            modal.classList.remove('active');
+            modal.querySelector('.modal').classList.remove('active');
+            setTimeout(() => {
+                modal.remove();
+            }, 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('troubleshooting_guide.md')
+                .then(response => response.text())
+                .then(content => {
+                    guideData = parseMarkdown(content);
+                    const guide = document.getElementById('guide');
+
+                    guide.innerHTML = Object.keys(guideData).map(product => `
+                        <div class="product" data-product="${product}">
+                            <div class="product-header">${product}</div>
+                        </div>
+                    `).join('');
+
+                    document.querySelectorAll('.product').forEach(product => {
+                        product.addEventListener('click', () => {
+                            showModal(product.dataset.product);
+                        });
+                    });
+                });
+
+            // Update the search functionality
+            document.querySelector('.search').addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const guide = document.getElementById('guide');
+                const products = document.querySelectorAll('.product');
+                let hasResults = false;
+
+                products.forEach(product => {
+                    const productText = product.textContent.toLowerCase();
+                    const shouldShow = productText.includes(searchTerm);
+                    product.style.display = shouldShow ? 'flex' : 'none';
+                    if (shouldShow) hasResults = true;
+                });
+
+                // Remove existing no results message if it exists
+                const existingMessage = guide.querySelector('.no-results');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+
+                // Show no results message if needed
+                if (searchTerm.length > 0 && !hasResults) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-results';
+                    noResults.textContent = 'No matching results found';
+                    guide.appendChild(noResults);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
