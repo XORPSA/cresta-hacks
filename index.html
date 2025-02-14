@@ -15,7 +15,7 @@
 
         /* BODY is now full width; no max-width or auto margins here */
         body {
-            margin: 0;
+            margin: 0; 
             padding: 0;
             background: var(--background-color);
             color: var(--text-color);
@@ -400,12 +400,11 @@
 </head>
 
 <body>
-    <!-- .container wraps your main content -->
+    <!-- Main content container -->
     <div class="container">
         <h1>Troubleshooting Guide</h1>
         <div class="search-container">
-            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
@@ -413,93 +412,74 @@
         </div>
         <div id="guide"></div>
     </div>
-    
-    <!-- The modal markup is appended to body (full viewport) -->
 
+    <!-- Scripts for interactivity -->
     <script>
-        // Update the parseMarkdown function to create a different structure
         function parseMarkdown(content) {
-            const lines = content.split('\n');
-            const data = {};
-            let currentProduct = '';
-            let currentIssue = '';
+    const lines = content.split('\n');
+    const data = {};
+    let currentProduct = '';
+    let currentIssue = '';
 
-            lines.forEach(line => {
-                if (line.startsWith('# Product:')) {
-                    const productMatch = line.match(/['"](.+?)['"]/) || [];
-                    currentProduct = productMatch[1] || line;
-                    data[currentProduct] = { issues: {} };
-                } else if (line.startsWith('## **Issue:')) {
-                    const issueMatch = line.match(/['"](.+?)['"]/) || [];
-                    currentIssue = issueMatch[1] || line;
-                    data[currentProduct].issues[currentIssue] = [];
-                } else if (line.startsWith('- ')) {
-                    const step = line.substring(2);
-                    data[currentProduct].issues[currentIssue].push(step);
-                }
-            });
-
-            return data;
+    lines.forEach(line => {
+        if (line.startsWith('# Product:')) {
+            // Extract product name, remove brackets, quotes, commas, and trim spaces
+            currentProduct = line.substring(10).trim();
+            currentProduct = currentProduct.replace(/['"\(\)\{\}\[\]]/g, '').split(',')[0].trim();
+            data[currentProduct] = { issues: {} };
+        } else if (line.startsWith('## **Issue:')) {
+            // Extract issue name, remove brackets, quotes, commas, and trim spaces
+            currentIssue = line.substring(12).trim();
+            currentIssue = currentIssue.replace(/['"\(\)\{\}\[\]]/g, '').split(',')[0].trim();
+            data[currentProduct].issues[currentIssue] = [];
+        } else if (line.startsWith('- ')) {
+            // Extract steps and clean them
+            const step = line.substring(2).trim();
+            data[currentProduct].issues[currentIssue].push(step);
         }
+    });
+
+    return data;
+}
+
 
         let guideData = null;
-        let currentProduct = null;
-        let currentIssue = null;
 
         function showModal(product) {
-    let modalOverlay = document.querySelector('.modal-overlay');
-    if (!modalOverlay) {
-        modalOverlay = document.createElement('div');
-        modalOverlay.className = 'modal-overlay';
-        document.body.appendChild(modalOverlay);
-    }
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay active';
 
-    modalOverlay.innerHTML = `
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">${product}</div>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="issue-list">
-                ${Object.keys(guideData[product].issues).map(issue => `
-                    <div class="issue-item">${issue}</div>
-                `).join('')}
-            </div>
-        </div>
-    `;
+            modalOverlay.innerHTML = `
+                <div class="modal active">
+                    <div class="modal-header">
+                        <div class="modal-title">${product}</div>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="issue-list">
+                        ${Object.keys(guideData[product].issues).map(issue => `
+                            <div class="issue-item">${issue}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
 
-    // Add active class to show modal
-    requestAnimationFrame(() => {
-        modalOverlay.classList.add('active');
-        modalOverlay.querySelector('.modal').classList.add('active');
-    });
+            document.body.appendChild(modalOverlay);
 
-    // Close modal functionality
-    modalOverlay.querySelector('.modal-close').addEventListener('click', () => closeModal(modalOverlay));
-
-    // Handle issue item clicks
-    modalOverlay.querySelectorAll('.issue-item').forEach(item => {
-        item.addEventListener('click', () => {
-            showSteps(item.textContent, modalOverlay);
-        });
-    });
-}
-
-function closeModal(modalOverlay) {
-    modalOverlay.classList.remove('active');
-    setTimeout(() => modalOverlay.remove(), 300); // Wait for fade-out animation
-}
-
-
-        function showSteps(issue, modal) {
-            console.log('Steps view initial position:', {
-                scrollTop: modal.querySelector('.modal').scrollTop
+            modalOverlay.querySelector('.modal-close').addEventListener('click', () => {
+                closeModal(modalOverlay);
             });
 
-            currentIssue = issue;
-            const steps = guideData[currentProduct].issues[issue];
+            modalOverlay.querySelectorAll('.issue-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    showSteps(product, item.textContent, modalOverlay);
+                });
+            });
+        }
 
-            const modalContent = modal.querySelector('.modal');
+        function showSteps(product, issue, modalOverlay) {
+            const steps = guideData[product].issues[issue];
+            const modalContent = modalOverlay.querySelector('.modal');
+
             modalContent.innerHTML = `
                 <div class="modal-header">
                     <div class="modal-title">${issue}</div>
@@ -513,58 +493,18 @@ function closeModal(modalOverlay) {
                 </div>
             `;
 
-            // Log final scroll position after content change
-            requestAnimationFrame(() => {
-                console.log('Steps view final position:', {
-                    scrollTop: modalContent.scrollTop,
-                    height: modalContent.scrollHeight
-                });
-            });
-
             modalContent.querySelector('.modal-close').addEventListener('click', () => {
-                closeModal(modal);
+                closeModal(modalOverlay);
             });
 
             modalContent.querySelector('.back-to-issues').addEventListener('click', () => {
-                console.log('Transitioning back to issues view');
-                // Just update the content instead of creating a new modal
-                const modalContent = modal.querySelector('.modal');
-                modalContent.innerHTML = `
-                    <div class="modal-header">
-                        <div class="modal-title">${currentProduct}</div>
-                        <button class="modal-close">&times;</button>
-                    </div>
-                    <div class="issue-list">
-                        ${Object.keys(guideData[currentProduct].issues).map(issue => `
-                            <div class="issue-item">${issue}</div>
-                        `).join('')}
-                    </div>
-                `;
-
-                // Reattach event listeners
-                modalContent.querySelector('.modal-close').addEventListener('click', () => {
-                    closeModal(modal);
-                });
-
-                modalContent.querySelectorAll('.issue-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        showSteps(item.textContent, modal);
-                    });
-                });
+                showModal(product);
             });
         }
 
-        function closeModal(modal) {
-            console.log('Closing modal from position:', {
-                top: modal.querySelector('.modal').getBoundingClientRect().top,
-                left: modal.querySelector('.modal').getBoundingClientRect().left
-            });
-
-            modal.classList.remove('active');
-            modal.querySelector('.modal').classList.remove('active');
-            setTimeout(() => {
-                modal.remove();
-            }, 300);
+        function closeModal(modalOverlay) {
+            modalOverlay.classList.remove('active');
+            setTimeout(() => modalOverlay.remove(), 300);
         }
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -587,7 +527,6 @@ function closeModal(modalOverlay) {
                     });
                 });
 
-            // Update the search functionality
             document.querySelector('.search').addEventListener('input', function (e) {
                 const searchTerm = e.target.value.toLowerCase();
                 const guide = document.getElementById('guide');
@@ -601,13 +540,11 @@ function closeModal(modalOverlay) {
                     if (shouldShow) hasResults = true;
                 });
 
-                // Remove existing no results message if it exists
                 const existingMessage = guide.querySelector('.no-results');
                 if (existingMessage) {
                     existingMessage.remove();
                 }
 
-                // Show no results message if needed
                 if (searchTerm.length > 0 && !hasResults) {
                     const noResults = document.createElement('div');
                     noResults.className = 'no-results';
@@ -618,4 +555,5 @@ function closeModal(modalOverlay) {
         });
     </script>
 </body>
+
 </html>
